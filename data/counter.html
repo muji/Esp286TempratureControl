@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+
+<head>
+<meta charset = "utf-8" />
+                 <title>Counter </title>
+                 <meta name = "viewport" content = "width=device-width">
+                              <style>
+.container {
+  width: 450px;
+  margin: 0 auto;
+text - align: center;
+}
+
+.gauge {
+  width: 450px;
+  height: 450px;
+}
+
+a: link.button,
+a: active.button,
+a: visited.button,
+a: hover.button {
+  margin: 30px 5px 0 2px;
+  padding: 7px 13px;
+}
+</style>
+</head>
+
+<body>
+<div class = "container">
+               <div id = "g1" class = "gauge"> </div>
+                                        <a href = "#" id = "g1_refresh">K_type Temperature </a>
+                                            </div>
+
+<div>
+  Temperature Range (between 1 and 700):
+  <input id="setTemp" type="number" name="quantity" min="1" max="700"><br>
+
+  <input type="submit">
+
+</div>
+
+                                            <div>
+                                              <button onclick="callToServer()">Click me to Send Server Message on Socket </button>
+                                              
+
+
+                                            </div>
+                                            <script src = "raphael-2.1.4.min.js"> </script>
+                                                <script src = "justgage.js"> </script>
+                                                    <script type = "text/javascript">
+                                                        var g1;
+var Analog0 = new Array(); // create the arrays for the analog readings here.
+
+document.addEventListener("DOMContentLoaded", function(event) {
+  console.log("DOM fully loaded and parsed");
+  g1 = new JustGage({
+id: "g1",
+    value: 0,
+    min: 0,
+    max: 700,
+donut: true,
+pointer: true,
+    gaugeWidthScale: 0.6,
+counter: true,
+hideInnerShadow: true,
+title: "Temperature",
+titlePosition: "below"
+  });
+});
+var connection 
+function callToServer(elmnt,clr) {
+    
+    if(null!=connection)
+     var tempt=document.getElementById("setTemp").value;
+     console.log('Value is ', tempt);
+    connection.send(" value to server is "+tempt);
+}
+
+function connect() {
+connection = new WebSocket('ws://' + location.hostname + ':81/', ['arduino']);
+connection.onopen = function () {
+  connection.send('GET_TEMP');
+  
+
+};
+
+connection.onclose = function(e) {
+    console.log('Socket is closed. Reconnect will be attempted in 1 second.', e.reason);
+    location.reload();
+  };
+
+console.log("connection opened");
+connection.onerror = function (error) {
+  console.log('WebSocket Error ', error);
+};
+
+connection.onmessage = function(evt)
+{
+  // handle websocket message. update attributes or values of elements that match the name on incoming message
+  console.log("msg rec", evt.data);
+  var msgArray = evt.data.split(","); // split message by delimiter into a string array
+  console.log("msgArray", msgArray[0]);
+  console.log("msgArray", msgArray[1]);
+  console.log("msgArray", msgArray[2]);
+  console.log("msgArray", msgArray[3]);
+  var indicator = msgArray[1]; // the first element in the message array is the ID of the object to update
+  console.log("indiactor", indicator);
+  if (indicator) // if an object by the name of the message exists, update its value or its attributes
+  {
+    switch (msgArray[1])
+    {
+      case "Arduino":
+        console.log("Arduino ran");
+        var A0 = (msgArray[2]);
+        g1.refresh(A0, null);
+
+        var x = Analog0.length;
+        if (x <101)
+        {
+          Analog0[x] = A0;
+        }
+        else
+        {
+          Analog0.shift();
+          x = Analog0.length;
+          Analog0[x] = A0;
+        }
+
+        break;
+
+      default:
+        // unrecognized message type. do nothing
+        break;
+    } // switch
+  } // if (indicator)
+} // connection.onmessage
+;
+};
+connect();
+
+    </script>
+  </body>
+</html>
