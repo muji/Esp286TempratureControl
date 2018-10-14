@@ -90,7 +90,11 @@ void setup() {
 
 
 
- int tempNow;
+ int tempNowF;
+ int tempNowC;
+
+ int tempNowFonB;
+ int tempNowConB;
 
 
  
@@ -108,9 +112,12 @@ void loop() {
 
     if((t - l) > 3000) {   
       
-       //tempNow=thermocouple_A.readCelsius();
-       tempNow=thermocouple_A.readFahrenheit();
-    tempIgnitBurner=tempNow-TempSteps;
+       tempNowC=thermocouple_A.readCelsius();
+       tempNowF=thermocouple_A.readFahrenheit();
+        tempNowFonB=thermocouple_B.readFahrenheit();
+        tempNowConB=thermocouple_B.readCelsius();
+       
+    tempIgnitBurner=tempNowF-TempSteps;
    
     
    
@@ -118,7 +125,7 @@ void loop() {
                                           
                                           
 
-                                     webSocket.sendTXT(n, "wpMeter,Arduino,  " + String(tempNow) );
+                     webSocket.sendTXT(n, "wpMeter,Arduino,  " + String(tempNowF)+","+String(tempNowC)+","+tempNowFonB+","+tempNowConB );
                                    
 
                              }
@@ -129,14 +136,14 @@ void loop() {
    
       
                        // Make Gas off  // 
-                         if(intMaxSetTemp==tempNow)
+                         if(intMaxSetTemp==tempNowF)
                          {
                            shutdownGas();
                          }
 
                          // Make Gas On
                           
-                         if(tempNow<= tempIgnitBurner)
+                         if(tempNowF<= tempIgnitBurner)
                          {
                            makeGasOn();
                          }

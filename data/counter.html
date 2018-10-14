@@ -5,52 +5,82 @@
 <meta charset = "utf-8" />
                  <title>Counter </title>
                  <meta name = "viewport" content = "width=device-width">
-                              <style>
-.container {
-  width: 450px;
-  margin: 0 auto;
-text - align: center;
-}
-
-.gauge {
-  width: 450px;
-  height: 450px;
-}
-
-a: link.button,
-a: active.button,
-a: visited.button,
-a: hover.button {
-  margin: 30px 5px 0 2px;
-  padding: 7px 13px;
-}
-</style>
+                 <style>
+                    .grid-container {
+                      display: inline-grid;;
+                      
+                      grid-row-gap: 50px;
+                      grid-template-columns:  200px 200px 200px 200px;
+                      background-color: #2196F3;
+                      padding: 10px;
+                    }
+                    .grid-item {
+                      background-color: rgba(255, 255, 255, 0.8);
+                      border: 1px solid rgba(0, 0, 0, 0.8);
+                      padding: 20px;
+                      font-size: 30px;
+                      text-align: center;
+                    }
+                    </style>
 </head>
 
 <body>
-<div class = "container">
-               <div id = "g1" class = "gauge"> </div>
-                                        <a href = "#" id = "g1_refresh">K_type Temperature </a>
-                                            </div>
 
-<div>
+  
+      
+
+    <div class="grid-container">
+      <div class="grid-item">
+          <div class = "gauge" id = "g1" "> </div>
+      </div>
+      <div class="grid-item">
+          <div class = "gauge" id = "g2" "> </div>
+
+      </div>
+    </div>
+
+      <div class="grid-container">
+      <div class="grid-item">
+          <div class = "gauge" id = "g3" "> </div>
+      </div>
+      <div class="grid-item">
+          <div class = "gauge" id = "g4" "> </div>
+      </div>
+    </div>
+        
+        
+
+    
+    
+
+
+
+
   Temperature Range (between 1 and 700):
   <input id="setTemp" type="number" name="quantity" min="1" max="700"><br>
 
   <input type="submit">
 
-</div>
-
-                                            <div>
                                               <button onclick="callToServer()">Click me to Send Server Message on Socket </button>
                                               
 
 
                                             </div>
+
+
+
+
+
+
+
+
                                             <script src = "raphael-2.1.4.min.js"> </script>
                                                 <script src = "justgage.js"> </script>
                                                     <script type = "text/javascript">
                                                         var g1;
+                                                        var g2;
+                                                        var g3;
+                                                        var g4;
 var Analog0 = new Array(); // create the arrays for the analog readings here.
 
 document.addEventListener("DOMContentLoaded", function(event) {
@@ -62,10 +92,58 @@ id: "g1",
     max: 700,
 donut: true,
 pointer: true,
-    gaugeWidthScale: 0.6,
+    gaugeWidthScale: 0.3,
 counter: true,
 hideInnerShadow: true,
-title: "Temperature",
+title: " Probe A Centigrade",
+titlePosition: "below"
+  });
+
+
+
+  g2 = new JustGage({
+id: "g2",
+    value: 0,
+    min: 0,
+    max: 700,
+donut: true,
+pointer: true,
+    gaugeWidthScale: 0.3,
+counter: true,
+hideInnerShadow: true,
+title: " Probe A Centigrade Fareheit",
+titlePosition: "below"
+  });
+
+
+
+
+   g3 = new JustGage({
+id: "g3",
+    value: 0,
+    min: 0,
+    max: 700,
+donut: true,
+pointer: true,
+    gaugeWidthScale: 0.3,
+counter: true,
+hideInnerShadow: true,
+title: "Probe B Centigrade",
+titlePosition: "below"
+  });
+
+
+   g4 = new JustGage({
+id: "g4",
+    value: 0,
+    min: 0,
+    max: 700,
+donut: true,
+pointer: true,
+    gaugeWidthScale: 0.3,
+counter: true,
+hideInnerShadow: true,
+title: "Probe B FareHeit",
 titlePosition: "below"
   });
 });
@@ -114,7 +192,13 @@ connection.onmessage = function(evt)
       case "Arduino":
         console.log("Arduino ran");
         var A0 = (msgArray[2]);
+        var A1 = (msgArray[3]);
+        var A2 = (msgArray[4]);
+        var A3 = (msgArray[5]);
         g1.refresh(A0, null);
+        g2.refresh(A1, null);
+        g3.refresh(A2, null);
+        g4.refresh(A3, null);
 
         var x = Analog0.length;
         if (x <101)
